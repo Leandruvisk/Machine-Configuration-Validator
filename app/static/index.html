@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Dispositivos</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Cadastro de Dispositivos</h1>
+    <form id="device-form">
+      <label>
+        Nome do dispositivo
+        <input type="text" name="name" required />
+      </label>
+      <label>
+        Tipo de dispositivo
+        <input type="text" name="device_type" required />
+      </label>
+      <label>
+        Número de série
+        <input type="text" name="serial_number" />
+      </label>
+      <label>
+        Localização
+        <input type="text" name="location" />
+      </label>
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <section>
+      <h2>Dispositivos cadastrados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Série</th>
+            <th>Local</th>
+          </tr>
+        </thead>
+        <tbody id="device-table"></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/static/main.js"></script>
+</body>
+</html>

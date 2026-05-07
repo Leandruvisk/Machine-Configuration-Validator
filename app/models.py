@@ -30,3 +30,18 @@ class MotorTelemetry(models.Model):
 
     def __str__(self) -> str:
         return f"Telemetry {self.timestamp.isoformat()} - {self.status}"
+
+
+class Device(models.Model):
+    id = fields.IntField(pk=True)
+    name = fields.CharField(max_length=128)
+    device_type = fields.CharField(max_length=128)
+    serial_number = fields.CharField(max_length=128, null=True)
+    location = fields.CharField(max_length=128, null=True)
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+    class Meta:
+        table = "devices"
+
+    def __str__(self) -> str:
+        return f"Device {self.name} [{self.device_type}]"

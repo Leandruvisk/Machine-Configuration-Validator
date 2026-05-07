@@ -68,6 +68,14 @@ poetry install
 poetry run python app/main.py
 ```
 
+### Frontend de cadastro
+
+```bash
+poetry run uvicorn app.web_app:app --reload --host 0.0.0.0 --port 8000
+```
+
+Acesse o cadastro em `http://localhost:8000`.
+
 ### Migrações com Aerich
 
 ```bash
