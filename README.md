@@ -80,11 +80,22 @@ poetry run aerich upgrade
 ### Scripts úteis
 
 ```bash
-./run_poetry.sh    # Linux/Mac
-run_poetry.bat     # Windows
-./run_migrations.sh # Linux/Mac
-run_migrations.bat  # Windows
+./run_poetry.sh       # Linux/Mac
+run_poetry.bat        # Windows
+./run_migrations.sh   # Linux/Mac
+run_migrations.bat    # Windows
+./run_motor_simulator.py  # Gerar dados do motor simulado
 ```
+
+### Simulação de motor
+
+Para gerar dados de telemetria em paralelo e alimentar o backend, execute:
+
+```bash
+poetry run python run_motor_simulator.py
+```
+
+O simulador grava registros de telemetria no banco PostgreSQL e atualiza a tabela `motor_telemetry` a cada 2 segundos.
 
 ## Configuração
 

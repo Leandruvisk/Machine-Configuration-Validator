@@ -13,3 +13,20 @@ class ValidationResult(models.Model):
 
     def __str__(self) -> str:
         return f"{self.validator_name} - {self.status}"
+
+
+class MotorTelemetry(models.Model):
+    id = fields.IntField(pk=True)
+    timestamp = fields.DatetimeField()
+    rpm = fields.IntField()
+    temperature = fields.FloatField()
+    vibration = fields.FloatField()
+    voltage = fields.FloatField()
+    current = fields.FloatField()
+    status = fields.CharField(max_length=32)
+
+    class Meta:
+        table = "motor_telemetry"
+
+    def __str__(self) -> str:
+        return f"Telemetry {self.timestamp.isoformat()} - {self.status}"
