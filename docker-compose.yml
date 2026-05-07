@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  validator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: machine-config-validator
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./reports:/app/reports
+      - /proc:/host/proc:ro  # Access to host proc for system info
+      - /sys:/host/sys:ro    # Access to host sys for system info
+    environment:
+      - PYTHONPATH=/app
+    # Uncomment the following if the validator needs privileged access
+    # privileged: true
+    # cap_add:
+    #   - SYS_ADMIN
+    restart: unless-stopped

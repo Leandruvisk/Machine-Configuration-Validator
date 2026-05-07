@@ -1,0 +1,29 @@
+# Expected machine configuration
+cpu:
+  min_cores: 4
+  min_frequency_ghz: 2.5
+
+memory:
+  min_gb: 8
+
+disk:
+  min_free_gb: 50
+  partitions:
+    - mount_point: /
+      min_free_gb: 20
+    - mount_point: /var
+      min_free_gb: 10
+
+network:
+  interfaces:
+    - name: eth0
+      required: true
+      min_speed_mbps: 1000
+
+services:
+  required:
+    - sshd
+    - systemd
+  optional:
+    - apache2
+    - nginx
