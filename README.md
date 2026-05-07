@@ -76,6 +76,8 @@ poetry run uvicorn app.web_app:app --reload --host 0.0.0.0 --port 8000
 
 Acesse o cadastro em `http://localhost:8000`.
 
+O frontend agora exibe o status MQTT atual usando o endpoint `/api/mqtt/latest`.
+
 ### Healthcheck
 
 A API de frontend expõe `/health` para monitoramento.

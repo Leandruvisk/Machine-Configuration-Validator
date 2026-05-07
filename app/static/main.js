@@ -41,4 +41,28 @@ form.addEventListener('submit', async (event) => {
   }
 });
 
+async function fetchMqttStatus() {
+  const statusContainer = document.getElementById('mqtt-status');
+  try {
+    const response = await fetch('/api/mqtt/latest');
+    const data = await response.json();
+    if (!Object.keys(data).length) {
+      statusContainer.innerHTML = '<p>Nenhuma mensagem MQTT recebida ainda.</p>';
+      return;
+    }
+
+    statusContainer.innerHTML = Object.entries(data).map(([topic, item]) => `
+      <div class="mqtt-item">
+        <strong>Tópico:</strong> ${topic}<br />
+        <strong>Timestamp:</strong> ${item.timestamp || 'sem timestamp'}<br />
+        <strong>Payload:</strong> <pre>${JSON.stringify(item.payload, null, 2)}</pre>
+      </div>
+    `).join('');
+  } catch (error) {
+    statusContainer.innerHTML = `<p>Erro ao consultar MQTT: ${error.message}</p>`;
+  }
+}
+
 fetchDevices();
+fetchMqttStatus();
+setInterval(fetchMqttStatus, 10000);

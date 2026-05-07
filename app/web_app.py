@@ -8,10 +8,12 @@ from tortoise.contrib.fastapi import register_tortoise
 from utils.logger import get_logger
 from db import TORTOISE_ORM
 from app.models import Device
+from app.mqtt_subscriber import MqttSubscriber
 
 logger = get_logger("web")
-
 app = FastAPI(title="Device Registration")
+
+mqtt_subscriber = MqttSubscriber(client_id="webapp-subscriber")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 
@@ -33,6 +35,13 @@ class DeviceRead(DeviceCreate):
 @app.on_event("startup")
 async def startup_event():
     logger.info("Starting web app and connecting to database")
+    mqtt_subscriber.start()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Stopping web app MQTT subscriber")
+    mqtt_subscriber.stop()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -82,6 +91,11 @@ async def list_devices():
         serial_number=device.serial_number,
         location=device.location,
     ) for device in devices]
+
+
+@app.get("/api/mqtt/latest")
+async def get_latest_mqtt():
+    return mqtt_subscriber.latest()
 
 
 register_tortoise(
