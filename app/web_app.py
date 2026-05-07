@@ -42,6 +42,16 @@ async def index():
         return HTMLResponse(f.read())
 
 
+@app.get("/health")
+async def health_check():
+    try:
+        db_ok = await Device.exists()
+        return {"status": "ok", "database": "connected" if db_ok else "connected"}
+    except Exception as exc:
+        logger.error(f"Health check failed: {exc}")
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+
 @app.post("/api/devices", response_model=DeviceRead)
 async def create_device(device: DeviceCreate):
     if not device.name.strip() or not device.device_type.strip():

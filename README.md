@@ -76,6 +76,10 @@ poetry run uvicorn app.web_app:app --reload --host 0.0.0.0 --port 8000
 
 Acesse o cadastro em `http://localhost:8000`.
 
+### Healthcheck
+
+A API de frontend expõe `/health` para monitoramento.
+
 ### Migrações com Aerich
 
 ```bash
