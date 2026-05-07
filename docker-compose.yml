@@ -34,6 +34,12 @@ services:
     environment:
       - PYTHONPATH=/app
       - DATABASE_URL=postgres://validator:validator@db:5432/validator
+    healthcheck:
+      test: ["CMD", "python", "app/validator_healthcheck.py"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   frontend:

@@ -79,6 +79,7 @@ Acesse o cadastro em `http://localhost:8000`.
 ### Healthcheck
 
 A API de frontend expõe `/health` para monitoramento.
+O container `validator` também possui healthcheck via script Python `/app/validator_healthcheck.py`.
 
 ### Migrações com Aerich
 
