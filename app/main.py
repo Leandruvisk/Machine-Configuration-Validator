@@ -22,18 +22,16 @@ from validators.disk_validator import DiskValidator
 from validators.network_validator import NetworkValidator
 from validators.services_validator import ServicesValidator
 
+import asyncio
+
 from utils.logger import get_logger
 from utils.config_loader import ConfigLoader
+from db import init_db, close_db
+from models import ValidationResult
 
-def main():
-    logger = get_logger()
-    logger.info("Starting Machine Configuration Validator")
+logger = get_logger()
 
-    # Load configuration
-    config_loader = ConfigLoader()
-    expected_config = config_loader.load_config()
-
-    # Initialize validators
+def run_validations(expected_config):
     validators = [
         CPUValidator(expected_config.get('cpu', {})),
         MemoryValidator(expected_config.get('memory', {})),
@@ -42,7 +40,6 @@ def main():
         ServicesValidator(expected_config.get('services', {})),
     ]
 
-    # Run validations
     results = {}
     for validator in validators:
         try:
@@ -53,10 +50,38 @@ def main():
             logger.error(f"Error in {validator.__class__.__name__}: {str(e)}")
             results[validator.__class__.__name__] = {'status': 'error', 'message': str(e)}
 
-    # Generate report
-    generate_report(results)
+    return results
 
-    logger.info("Validation completed")
+
+async def main():
+    logger = get_logger()
+    logger.info("Starting Machine Configuration Validator")
+
+    await init_db()
+    try:
+        config_loader = ConfigLoader()
+        expected_config = config_loader.load_config()
+
+        results = run_validations(expected_config)
+        await save_results(results)
+        generate_report(results)
+
+        logger.info("Validation completed")
+    finally:
+        await close_db()
+
+
+async def save_results(results):
+    for validator_name, result in results.items():
+        await ValidationResult.create(
+            validator_name=validator_name,
+            status=result.get('status', 'unknown'),
+            message=result.get('message', ''),
+        )
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 def generate_report(results):
     """Generate validation report"""
@@ -75,5 +100,6 @@ def generate_report(results):
 
     print(f"Report generated: {report_path}")
 
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

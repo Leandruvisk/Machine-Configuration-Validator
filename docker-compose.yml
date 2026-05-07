@@ -1,11 +1,25 @@
-version: '3.8'
+﻿version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: machine-config-validator-db
+    environment:
+      - POSTGRES_USER=validator
+      - POSTGRES_PASSWORD=validator
+      - POSTGRES_DB=validator
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   validator:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: machine-config-validator
+    depends_on:
+      - db
     volumes:
       - ./configs:/app/configs:ro
       - ./reports:/app/reports
@@ -13,8 +27,8 @@ services:
       - /sys:/host/sys:ro    # Access to host sys for system info
     environment:
       - PYTHONPATH=/app
-    # Uncomment the following if the validator needs privileged access
-    # privileged: true
-    # cap_add:
-    #   - SYS_ADMIN
+      - DATABASE_URL=postgres://validator:validator@db:5432/validator
     restart: unless-stopped
+
+volumes:
+  db_data:

@@ -59,11 +59,22 @@ poetry --version
 docker-compose up --build
 ```
 
+Isso inicia o serviço `validator` e o banco PostgreSQL em `db`.
+
 ### Com Poetry
 
 ```bash
 poetry install
 poetry run python app/main.py
+```
+
+### Migrações com Aerich
+
+```bash
+poetry run aerich init
+poetry run aerich init-db
+poetry run aerich migrate
+poetry run aerich upgrade
 ```
 
 ### Scripts úteis
@@ -74,6 +85,17 @@ run_poetry.bat     # Windows
 ```
 
 ## Configuração
+
+### Configuração do PostgreSQL
+
+O banco PostgreSQL é configurado com as seguintes variáveis de ambiente:
+
+- `DATABASE_URL=postgres://validator:validator@db:5432/validator`
+- `DB_HOST=db`
+- `DB_PORT=5432`
+- `DB_NAME=validator`
+- `DB_USER=validator`
+- `DB_PASSWORD=validator`
 
 Edite `configs/expected_config.yaml` para definir os requisitos mínimos do sistema:
 
