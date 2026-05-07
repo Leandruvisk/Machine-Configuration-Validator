@@ -7,13 +7,14 @@ from dotenv import load_dotenv
 from utils.logger import get_logger
 from db import TORTOISE_ORM
 from models import MotorTelemetry
+from mqtt_client import MqttClient
 
 load_dotenv()
 logger = get_logger("MotorSimulator")
 
 
 class MotorSimulator:
-    def __init__(self, record_interval: float = 2.0):
+    def __init__(self, record_interval: float = 10.0):
         self.record_interval = record_interval
         self.metrics = {
             "rpm": 1500,
@@ -23,6 +24,7 @@ class MotorSimulator:
             "current": 35.0,
         }
         self.lock = asyncio.Lock()
+        self.mqtt = MqttClient(client_id="motor-simulator")
 
     async def init_db(self) -> None:
         logger.info("Initializing Tortoise ORM for motor simulator")
@@ -36,6 +38,7 @@ class MotorSimulator:
     async def run(self) -> None:
         await self.init_db()
         try:
+            self.mqtt.publish("motor/simulator/connected", {"status": "connected", "timestamp": datetime.utcnow().isoformat()})
             tasks = [
                 self._simulate_rpm(),
                 self._simulate_temperature(),
@@ -47,6 +50,7 @@ class MotorSimulator:
             await asyncio.gather(*tasks)
         finally:
             await self.close_db()
+            self.mqtt.disconnect()
 
     async def _simulate_rpm(self) -> None:
         while True:
@@ -106,6 +110,16 @@ class MotorSimulator:
                 current=payload["current"],
                 status=status,
             )
+            telemetry_payload = {
+                "timestamp": timestamp.isoformat(),
+                "rpm": payload["rpm"],
+                "temperature": payload["temperature"],
+                "vibration": payload["vibration"],
+                "voltage": payload["voltage"],
+                "current": payload["current"],
+                "status": status,
+            }
+            self.mqtt.publish("motor/telemetry", telemetry_payload)
 
             logger.info(
                 f"Telemetry saved at {timestamp.isoformat()} - rpm={payload['rpm']} "

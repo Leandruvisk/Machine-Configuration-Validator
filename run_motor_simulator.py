@@ -5,7 +5,7 @@ from app.motor_simulator import MotorSimulator
 
 
 async def main():
-    simulator = MotorSimulator(record_interval=2.0)
+    simulator = MotorSimulator(record_interval=10.0)
     try:
         await simulator.run()
     except KeyboardInterrupt:

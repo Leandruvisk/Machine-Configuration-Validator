@@ -18,6 +18,7 @@ RUN poetry install --only=main --no-dev
 
 # Copy the application code
 COPY app/ .
+COPY run_motor_simulator.py .
 
 # Create directories for configs and reports
 RUN mkdir -p /app/configs /app/reports

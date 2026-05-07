@@ -8,6 +8,7 @@ import os
 import sys
 import yaml
 from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -28,6 +29,7 @@ from utils.logger import get_logger
 from utils.config_loader import ConfigLoader
 from db import init_db, close_db
 from models import ValidationResult
+from mqtt_client import MqttClient
 
 logger = get_logger()
 
@@ -57,18 +59,30 @@ async def main():
     logger = get_logger()
     logger.info("Starting Machine Configuration Validator")
 
+    mqtt = MqttClient(client_id="validator-backend")
     await init_db()
     try:
         config_loader = ConfigLoader()
         expected_config = config_loader.load_config()
+        validation_interval = float(os.getenv("VALIDATION_INTERVAL", "10"))
 
-        results = run_validations(expected_config)
-        await save_results(results)
-        generate_report(results)
+        while True:
+            results = run_validations(expected_config)
+            await save_results(results)
+            generate_report(results)
 
-        logger.info("Validation completed")
+            mqtt.publish(
+                "backend/validation",
+                {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "results": results,
+                },
+            )
+            logger.info("Published validation results to MQTT")
+            await asyncio.sleep(validation_interval)
     finally:
         await close_db()
+        mqtt.disconnect()
 
 
 async def save_results(results):
@@ -79,9 +93,6 @@ async def save_results(results):
             message=result.get('message', ''),
         )
 
-
-if __name__ == "__main__":
-    asyncio.run(main())
 
 def generate_report(results):
     """Generate validation report"""

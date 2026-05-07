@@ -59,7 +59,7 @@ poetry --version
 docker-compose up --build
 ```
 
-Isso inicia o serviço `validator` e o banco PostgreSQL em `db`.
+Isso inicia o serviço `validator`, o simulador, o broker Mosquitto, o frontend e o banco PostgreSQL em `db`.
 
 ### Com Poetry
 
@@ -80,6 +80,12 @@ Acesse o cadastro em `http://localhost:8000`.
 
 A API de frontend expõe `/health` para monitoramento.
 O container `validator` também possui healthcheck via script Python `/app/validator_healthcheck.py`.
+
+### MQTT / Mosquitto
+
+O projeto agora inclui um broker Mosquitto no `docker-compose.yml`.
+O backend publica resultados de validação no tópico `machine/backend/validation` a cada 10 segundos.
+O simulador publica telemetria no tópico `machine/motor/telemetry` a cada 10 segundos.
 
 ### Migrações com Aerich
 
@@ -108,7 +114,7 @@ Para gerar dados de telemetria em paralelo e alimentar o backend, execute:
 poetry run python run_motor_simulator.py
 ```
 
-O simulador grava registros de telemetria no banco PostgreSQL e atualiza a tabela `motor_telemetry` a cada 2 segundos.
+O simulador grava registros de telemetria no banco PostgreSQL e publica mensagens MQTT a cada 10 segundos no tópico `machine/motor/telemetry`.
 
 ## Configuração
 

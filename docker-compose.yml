@@ -19,6 +19,15 @@ services:
       retries: 5
       start_period: 10s
 
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: machine-config-validator-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+    restart: unless-stopped
+
   validator:
     build:
       context: .
@@ -26,6 +35,7 @@ services:
     container_name: machine-config-validator
     depends_on:
       - db
+      - mosquitto
     volumes:
       - ./configs:/app/configs:ro
       - ./reports:/app/reports
@@ -34,12 +44,37 @@ services:
     environment:
       - PYTHONPATH=/app
       - DATABASE_URL=postgres://validator:validator@db:5432/validator
+      - MQTT_HOST=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_TOPIC_PREFIX=machine
     healthcheck:
       test: ["CMD", "python", "app/validator_healthcheck.py"]
       interval: 15s
       timeout: 5s
       retries: 3
       start_period: 10s
+    restart: unless-stopped
+
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: machine-config-validator-simulator
+    depends_on:
+      - db
+      - mosquitto
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./reports:/app/reports
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgres://validator:validator@db:5432/validator
+      - MQTT_HOST=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_TOPIC_PREFIX=machine
+    command: ["python", "run_motor_simulator.py"]
     restart: unless-stopped
 
   frontend:
@@ -69,3 +104,4 @@ services:
 
 volumes:
   db_data:
+  mosquitto_data:
