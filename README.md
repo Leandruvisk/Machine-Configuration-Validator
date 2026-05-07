@@ -82,6 +82,8 @@ poetry run aerich upgrade
 ```bash
 ./run_poetry.sh    # Linux/Mac
 run_poetry.bat     # Windows
+./run_migrations.sh # Linux/Mac
+run_migrations.bat  # Windows
 ```
 
 ## Configuração
