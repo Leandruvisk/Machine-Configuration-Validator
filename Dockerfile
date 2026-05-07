@@ -1,14 +1,20 @@
 # Use Python 3.11 slim image
 FROM python:3.11-slim
 
+# Install Poetry
+RUN pip install poetry
+
 # Set working directory
 WORKDIR /app
 
-# Copy requirements first for better caching
-COPY app/requirements.txt .
+# Copy Poetry files
+COPY pyproject.toml poetry.lock* ./
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Configure Poetry to not create virtual environment
+RUN poetry config virtualenvs.create false
+
+# Install dependencies
+RUN poetry install --only=main --no-dev
 
 # Copy the application code
 COPY app/ .

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "machine-configuration-validator"
+version = "0.1.0"
+description = "Validação de configurações de máquinas industriais"
+authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psutil = "^5.9.0"
+pyyaml = "^6.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+black = "^23.0.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

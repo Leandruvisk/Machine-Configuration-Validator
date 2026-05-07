@@ -21,6 +21,11 @@ wheels/
 *.egg
 MANIFEST
 
+# Poetry
+poetry.lock
+.venv
+venv/
+
 # Virtual environments
 .env
 .venv
